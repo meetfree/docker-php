@@ -34,10 +34,10 @@ RUN mkdir -p /usr/src/php/ext \
 #    && ln -s /tmp/node-v12.13.0-linux-x64/bin/npm /usr/bin/npm
 
 # 安装 swoole
-#COPY ./resources/swoole-src-4.4.12.zip .
-#RUN cd /tmp && unzip swoole-src-4.4.12.zip \
-#    && cd swoole-src-4.4.12 && phpize && ./configure \
-#    && make && make install && rm -rf /tmp/swoole*
+ADD ./resources/swoole-src-4.4.12.zip .
+RUN cd /tmp && unzip swoole-src-4.4.12.zip \
+    && cd swoole-src-4.4.12 && phpize && ./configure \
+    && make && make install && rm -rf /tmp/swoole*
 
 # 安装 mcrypt
 ADD ./resources/mcrypt-1.0.3.tgz .
