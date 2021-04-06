@@ -1,0 +1,81 @@
+##################################
+#              addis             #
+##################################
+version: "3.1"
+#env_file: .env
+networks:
+  devme:
+    ipam:
+      config:
+        - subnet: 172.18.0.0/16
+services:
+    redis:
+      image: redis:alpine
+      container_name: devme-redis
+      networks:
+        devme:
+      volumes:
+        - ./data/redis:/data
+        - ./redis/redis.conf:/usr/local/etc/redis/redis.conf
+      ports:
+        - 6379:6379
+    mysql:
+      image: mysql:5.7
+      container_name: devme-mysql
+      volumes:
+        - ./data/mysql:/var/lib/mysql
+      environment:
+        - MYSQL_ROOT_PASSWORD=mysqlroot
+        - MYSQL_DATABASE=devme
+        - MYSQL_USER=devme
+        - MYSQL_PASSWORD=devme
+      ports:
+        - 3306:3306
+      networks:
+        devme:
+    elasticsearch:
+      image: elasticsearch:6.5.4
+      container_name: devme-elasticsearch
+      networks:
+        devme:
+    nginx:
+      image: nginx:alpine
+      container_name: devme-nginx
+      volumes:
+          - ../:/home/www:cached #php code
+          - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf #nginx config
+          - ./logs/nginx:/varlog/nginx/  #nginx log
+      ports:
+        - 80:80
+      networks:
+        devme:
+          ipv4_address: 172.18.18.2
+    rabbit:
+      image: rabbitmq:3-management
+      container_name: devme-rabbit
+      networks:
+        devme:
+      ports:
+        - 15672:15672
+        - 5672:5672
+    php73:
+      build:
+        context: ./php73
+        args:
+          PHP_VERSION: 7.3
+      container_name: devme-php73
+      working_dir: /home/www
+      volumes:
+        - ~/.ssh:/root/.ssh/
+        - ../:/home/www:cached
+        - ./data/php73:/root/.composer/
+        - ./php73/php.ini:/usr/local/etc/php/php.ini
+      extra_hosts:
+        - devme.test:172.18.18.2
+      networks:
+        devme:
+      depends_on:
+        - mysql
+        - redis
+      ports:
+        - 9000:9000
