@@ -47,4 +47,6 @@ RUN cd /tmp/mcrypt-1.0.3 && phpize && ./configure && make && make install && rm 
 ADD ./resources/mongodb-1.6.0.tgz .
 RUN cd /tmp/mongodb-1.6.0 && phpize && ./configure && make && make install && rm -rf /tmp/mongodb-1.6.0
 
+# 安装 swoole_loader73.so
+COPY ./resources/swoole_loader73.so /usr/local/lib/php/extensions/no-debug-non-zts-20180731/
 CMD php-fpm
