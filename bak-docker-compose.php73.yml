@@ -58,12 +58,18 @@ services:
       ports:
         - 15672:15672
         - 5672:5672
-    php54:
-      image: php:5.4.45-fpm
-      container_name: devme-php54
+    php73:
+      build:
+        context: ./php73
+        args:
+          PHP_VERSION: 7.3
+      container_name: devme-php73
       working_dir: /home/www
       volumes:
+        - ~/.ssh:/root/.ssh/
         - ../:/home/www:cached
+        - ./data/php73:/root/.composer/
+        - ./php73/php.ini:/usr/local/etc/php/php.ini
       extra_hosts:
         - devme.test:172.18.18.2
       networks:
