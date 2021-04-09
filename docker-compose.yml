@@ -11,7 +11,7 @@ networks:
 services:
     redis:
       image: redis:alpine
-      container_name: devme-redis
+      container_name: redis
       networks:
         devme:
       volumes:
@@ -21,7 +21,7 @@ services:
         - 6379:6379
     mysql:
       image: mysql:5.7
-      container_name: devme-mysql
+      container_name: mysql
       volumes:
         - ./data/mysql:/var/lib/mysql
       environment:
@@ -35,12 +35,12 @@ services:
         devme:
     elasticsearch:
       image: elasticsearch:6.5.4
-      container_name: devme-elasticsearch
+      container_name: elasticsearch
       networks:
         devme:
     nginx:
       image: nginx:alpine
-      container_name: devme-nginx
+      container_name: nginx
       volumes:
           - ../:/home/www:cached #php code
           - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf #nginx config
@@ -52,18 +52,24 @@ services:
           ipv4_address: 172.18.18.2
     rabbit:
       image: rabbitmq:3-management
-      container_name: devme-rabbit
+      container_name: rabbit
       networks:
         devme:
       ports:
         - 15672:15672
         - 5672:5672
-    php54:
-      image: php:5.4.45-fpm
-      container_name: devme-php54
+    php73:
+      build:
+        context: ./php73
+        args:
+          PHP_VERSION: 7.3
+      container_name: php73
       working_dir: /home/www
       volumes:
+        - ~/.ssh:/root/.ssh/
         - ../:/home/www:cached
+        - ./data/php73:/root/.composer/
+        - ./php73/php.ini:/usr/local/etc/php/php.ini
       extra_hosts:
         - devme.test:172.18.18.2
       networks:
